@@ -1,0 +1,24 @@
+PODS:
+  - CVCalendar (1.2.9)
+  - ENSwiftSideMenu (0.1)
+  - MGSwipeTableCell (1.5.5)
+  - Realm (0.98.6):
+    - Realm/Headers (= 0.98.6)
+  - Realm/Headers (0.98.6)
+  - RealmSwift (0.98.6):
+    - Realm (= 0.98.6)
+
+DEPENDENCIES:
+  - CVCalendar (~> 1.2.9)
+  - ENSwiftSideMenu (~> 0.1)
+  - MGSwipeTableCell
+  - RealmSwift
+
+SPEC CHECKSUMS:
+  CVCalendar: 0799256e0bc3b43e83b7e86c0729ce9ff0624cb6
+  ENSwiftSideMenu: 4e17a97d1d92c1a9c7267993a167e27e0a10422d
+  MGSwipeTableCell: bafeb5f351124544c9364ecbdf24c7b06a37d340
+  Realm: 44803f35418c5d89b27825a564247fcd190de37e
+  RealmSwift: c7239c52c83f8c43525a5269ba7be1694da33afc
+
+COCOAPODS: 0.39.0
