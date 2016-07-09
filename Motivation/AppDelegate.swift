@@ -14,22 +14,9 @@ import EventKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var eventStore: EKEventStore?
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
-        let eventStore = EKEventStore()
-        
-        eventStore.requestAccessToEntityType(EKEntityType.Reminder,
-                                             completion: {_,_ in 
-                                                })
-        let calendars =
-            eventStore.calendarsForEntityType(EKEntityType.Reminder)
-        
-        for calendar in calendars as [EKCalendar] {
-            print("Calendar = \(calendar.title)")
-        }
         return true
     }
 

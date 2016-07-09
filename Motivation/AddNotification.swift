@@ -10,14 +10,33 @@ import UIKit
 import EventKit
 import ENSwiftSideMenu
 
+struct TodoItem {
+    var title: String
+    var deadline: NSDate
+    var UUID: String
+    var isOverdue: Bool {
+        return (NSDate().compare(self.deadline) == NSComparisonResult.OrderedDescending)
+    }
+    
+    init(deadline: NSDate, title: String, UUID: String) {
+        self.deadline = deadline
+        self.title = title
+        self.UUID = UUID
+    }
+}
+
 class AddNotification: UITableViewController,  ENSideMenuDelegate{
     
     let citate = Citates()
     var importance = Int()
     var curRep = NSCalendarUnit()
     let repArr = [NSCalendarUnit.Minute, NSCalendarUnit.Hour, NSCalendarUnit.Day, NSCalendarUnit.Weekday, NSCalendarUnit.Year]
-    let reps = ["Каждую минуту", "Каждый час", "Каждый день" , "Каждую неделю", "Каждый год"]
+    let reps = ["Никогда", "Каждую минуту", "Каждый час", "Каждый день" , "Каждую неделю", "Каждый год"]
     var tap = UITapGestureRecognizer()
+    
+    @IBOutlet weak var remind: UISwitch!
+    
+    @IBOutlet weak var remindDate: UILabel!
     
     var titStr = String()
     @IBOutlet weak var date: UIDatePicker!
@@ -43,30 +62,6 @@ class AddNotification: UITableViewController,  ENSideMenuDelegate{
             toggleSideMenuView()
         }
     }
-    
-//    func sideMenuWillOpen() {
-//        if sideMenuOpened == false {
-//            UIView.animateWithDuration(0.5, animations: {
-//                self.view.frame = CGRectMake(self.view.frame.origin.x + 200, 0 , self.view.frame.width, self.view.frame.height)
-//            })
-//        }
-//    }
-//    
-//    func sideMenuWillClose() {
-//        if sideMenuOpened {
-//            UIView.animateWithDuration(0.5, animations: {
-//                self.view.frame = CGRectMake(self.view.frame.origin.x - 200, 0 , self.view.frame.width, self.view.frame.height)
-//            })
-//        }
-//    }
-//    
-//    func sideMenuDidOpen() {
-//        sideMenuOpened = true
-//    }
-//    
-//    func sideMenuDidClose() {
-//        sideMenuOpened = false
-//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -98,32 +93,22 @@ class AddNotification: UITableViewController,  ENSideMenuDelegate{
     }
     
     @IBAction func save(sender: AnyObject) {
-        let eventStore = EKEventStore()
-        eventStore.requestAccessToEntityType(EKEntityType.Event, completion: { (success, accessError) -> Void in
-        })
-        let event:EKEvent = EKEvent(eventStore: eventStore)
         
-        citate.parseJSON()
-        let randomNumber = arc4random_uniform(UInt32(citate.itemsArray.count))
-        let randCitate = citate.itemsArray[Int(randomNumber)]
-        let citTitle = randCitate.valueForKey("title") as! String
-        print(citTitle)
-//        
-//        let notification = UILocalNotification()
-//        notification.fireDate = date.date
-//        notification.alertBody = "\(tit.text! + "\nЦитата: " + citTitle)"
-//        notification.soundName = UILocalNotificationDefaultSoundName
-//        notification.userInfo = ["CustomField1": "w00t"]
-//        UIApplication.sharedApplication().scheduleLocalNotification(notification)
+        if remind.on == true {
+            
+            citate.parseJSON()
+            let randomNumber = arc4random_uniform(UInt32(citate.itemsArray.count))
+            let randCitate = citate.itemsArray[Int(randomNumber)]
+            let citTitle = randCitate.valueForKey("title") as! String
+            print(citTitle)
+            
+            let todoItem = TodoItem(deadline: date.date, title: "\(tit.text! + "\nЦитата: " + citTitle)", UUID: NSUUID().UUIDString)
+            TodoList.sharedInstance.addItem(todoItem)
+        }
         
-        event.title = "\(tit.text! + "\nЦитата: " + citTitle)"
-        event.startDate = date.date.dateByAddingTimeInterval(-3600)
-        event.endDate = date.date
-        event.calendar = eventStore.defaultCalendarForNewEvents
-        
-        try! eventStore.saveEvent(event, span: .ThisEvent)
         self.navigationController?.popViewControllerAnimated(true)
     }
+    
     
     func tapped() {
         if isSideMenuOpen() {

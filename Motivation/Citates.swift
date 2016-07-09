@@ -25,17 +25,15 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
     @IBOutlet weak var tab: UITabBar!
     @IBOutlet weak var fav: UITabBarItem!
     @IBOutlet weak var all: UITabBarItem!
-    @IBOutlet weak var noItems: UILabel!
     var sideMenuOpened = Bool()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tap = UITapGestureRecognizer(target: self, action: #selector(Citates.tapped))
-        citatesView.type = .CoverFlow
-        noItems.hidden = false
+        citatesView.type = .TimeMachine
         view.addGestureRecognizer(tap)
         citatesView.addGestureRecognizer(tap)
-        citatesView.scrollSpeed = 0.01
+        citatesView.scrollSpeed = 0.2
         // Do any additional setup after loading the view.
     }
     
@@ -94,8 +92,6 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
         }
     }
     func carousel(carousel: iCarousel, viewForItemAtIndex index: Int, reusingView view: UIView?) -> UIView {
-        
-        noItems.hidden = true
         var item = itemsArray[index]
         if tab.selectedItem == fav {
             item = favItems[index]
@@ -108,21 +104,25 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
             }
         }
         
-        favButton = UIButton(frame: CGRect(x: 10, y: 360, width: 30, height: 30))
+        favButton = UIButton(frame: CGRect(x: 125, y: 320, width: 50, height: 50))
         favButton.setImage(UIImage(named: "favYES"), forState: .Normal)
         favButton.tag = index
         favButton.addTarget(self, action: #selector(Citates.favoriteTapped(_:)), forControlEvents: .TouchUpInside)
         let tempView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 400))
-        tempView.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.8)
+        tempView.backgroundColor = UIColor(red: 0.65, green: 0.65, blue: 0.65, alpha: 0.8)
+        let bgImage = UIImageView(image: UIImage(named: "bg2"))
+        bgImage.frame = CGRect(x: 0, y: 50, width: 300, height: 250)
         let citateLabel = UITextView(frame: CGRect(x: 0, y: 50, width: 300, height: 250))
         citateLabel.text = item.valueForKey("title") as! String
+        citateLabel.font!.fontWithSize(40)
         citateLabel.textColor = UIColor.whiteColor()
         citateLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.7)
         citateLabel.userInteractionEnabled = false
-        citateLabel.sizeThatFits(citateLabel.frame.size)
         let authorButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
         authorButton.setTitle("\(item.valueForKey("author") as! String)", forState: .Normal)
         authorButton.addTarget(self, action: #selector(Citates.showIt(_:)), forControlEvents: .TouchUpInside)
+        authorButton.titleLabel!.textColor = UIColor.blackColor()
+        tempView.addSubview(bgImage)
         tempView.addSubview(citateLabel)
         tempView.addSubview(authorButton)
         tempView.addSubview(favButton)
@@ -215,7 +215,6 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
 
 extension Citates: UITabBarDelegate {
     func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
-        noItems.hidden = false
         citatesView.reloadData()
     }
 }
