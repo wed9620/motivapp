@@ -8,9 +8,8 @@
 
 import UIKit
 import RealmSwift
-import ENSwiftSideMenu
 
-class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideMenuDelegate {
+class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
     
     @IBOutlet var citatesView: iCarousel!
     
@@ -29,17 +28,16 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tap = UITapGestureRecognizer(target: self, action: #selector(Citates.tapped))
-        citatesView.type = .TimeMachine
+        citatesView.type = .CoverFlow
         view.addGestureRecognizer(tap)
         citatesView.addGestureRecognizer(tap)
-        citatesView.scrollSpeed = 0.2
+        citatesView.scrollSpeed = 0.3
+        citatesView.scrollOffset = 0
         // Do any additional setup after loading the view.
     }
     
     override func viewDidAppear(animated: Bool) {
         view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
-        self.sideMenuController()?.sideMenu?.delegate = self
     }
     
 //    func sideMenuWillOpen() {
@@ -70,17 +68,13 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func tapped() {
-        if isSideMenuOpen() {
-            toggleSideMenuView()
-        }
-    }
+
     override func awakeFromNib() {
         super.awakeFromNib()
         readFromDB()
         parseJSON()
     }
+
     func numberOfItemsInCarousel(carousel: iCarousel) -> Int {
         guard tab != nil else{
             return itemsArray.count
@@ -105,20 +99,22 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
         }
         
         favButton = UIButton(frame: CGRect(x: 125, y: 320, width: 50, height: 50))
+        favButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), forState: .Highlighted)
         favButton.setImage(UIImage(named: "favYES"), forState: .Normal)
         favButton.tag = index
         favButton.addTarget(self, action: #selector(Citates.favoriteTapped(_:)), forControlEvents: .TouchUpInside)
         let tempView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 400))
         tempView.backgroundColor = UIColor(red: 0.65, green: 0.65, blue: 0.65, alpha: 0.8)
-        let bgImage = UIImageView(image: UIImage(named: "bg2"))
+        let bgImage = UIImageView(image: UIImage(named: "citBG"))
         bgImage.frame = CGRect(x: 0, y: 50, width: 300, height: 250)
         let citateLabel = UITextView(frame: CGRect(x: 0, y: 50, width: 300, height: 250))
         citateLabel.text = item.valueForKey("title") as! String
-        citateLabel.font!.fontWithSize(40)
+        citateLabel.font = UIFont(name: (citateLabel.font?.fontName)!, size: 20)
         citateLabel.textColor = UIColor.whiteColor()
         citateLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.7)
         citateLabel.userInteractionEnabled = false
         let authorButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
+        authorButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), forState: .Highlighted)
         authorButton.setTitle("\(item.valueForKey("author") as! String)", forState: .Normal)
         authorButton.addTarget(self, action: #selector(Citates.showIt(_:)), forControlEvents: .TouchUpInside)
         authorButton.titleLabel!.textColor = UIColor.blackColor()
@@ -202,7 +198,8 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource, ENSideM
         }
     }
     @IBAction func toggle(sender: AnyObject) {
-        toggleSideMenuView()
+        
+        sideMenuViewController?._presentLeftMenuViewController()
     }
     func readFromDB() {
         favItems.removeAllObjects()

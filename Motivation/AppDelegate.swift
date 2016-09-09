@@ -11,12 +11,29 @@ import EventKit
 
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, SSASideMenuDelegate {
 
     var window: UIWindow?
+    var sideMenu: SSASideMenu!
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
+        //MARK : Setup SSASideMenu
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: NSBundle.mainBundle())
+        let rootVC = storyboard.instantiateViewControllerWithIdentifier("VC")
+        let nav = UINavigationController(rootViewController: rootVC)
+        nav.navigationBar.tintColor = UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1)
+        sideMenu = SSASideMenu(contentViewController: nav, leftMenuViewController: SideBar())
+//        sideMenu.backgroundImage = UIImage(named: "background.jpg")
+        sideMenu.configure(SSASideMenu.MenuViewEffect(fade: true, scale: true, scaleBackground: false))
+        sideMenu.configure(SSASideMenu.ContentViewEffect(alpha: 1.0, scale: 0.7))
+        sideMenu.configure(SSASideMenu.ContentViewShadow(enabled: true, color: UIColor.blackColor(), opacity: 0.6, radius: 6.0))
+        sideMenu.delegate = self
+        
+        window?.rootViewController = sideMenu
+        window?.makeKeyAndVisible()
+        
         return true
     }
 

@@ -12,5 +12,6 @@ import MGSwipeTableCell
 class templateCell: MGSwipeTableCell {
     
     @IBOutlet weak var desc: UITextView!
-
+    @IBOutlet weak var addClicked: UIButton!
+    var index: Int!
 }

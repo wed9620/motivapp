@@ -7,11 +7,10 @@
 //
 
 import UIKit
-import ENSwiftSideMenu
 
 class SideBar: UITableViewController {
     var selectedMenuItem : Int = 0
-    let itemsMS = ["Список Целей", "План", "Календарь", "Цитаты"]
+    let itemsMS = ["Цели", "План", "Календарь", "Цитаты"]
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -78,6 +77,7 @@ class SideBar: UITableViewController {
         
         //Present new view controller
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main",bundle: nil)
+        
         var destViewController : UIViewController
         switch (indexPath.row) {
         case 0:
@@ -97,6 +97,8 @@ class SideBar: UITableViewController {
             destViewController = mainStoryboard.instantiateViewControllerWithIdentifier("VC")
             break
         }
-        sideMenuController()?.setContentViewController(destViewController)
+
+        sideMenuViewController?.contentViewController = UINavigationController(rootViewController: destViewController)
+        sideMenuViewController?.hideMenuViewController()
     }
 }

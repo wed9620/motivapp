@@ -10,8 +10,8 @@ import UIKit
 import MGSwipeTableCell
 
 class CustomCell: MGSwipeTableCell {
-    
     @IBOutlet weak var desc: UITextView!
     @IBOutlet weak var fireDate: UILabel!
-    
+    @IBOutlet weak var tweet: UIButton!
+    @IBOutlet weak var preferences: UIButton!
 }

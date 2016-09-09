@@ -10,13 +10,11 @@ import Foundation
 import RealmSwift
 
 class Notes: Object {
-    
     dynamic var title = String()
     dynamic var desc = String()
 }
 
 class Templates: Object {
-    
     dynamic var title = String()
     dynamic var desc = String()
 }

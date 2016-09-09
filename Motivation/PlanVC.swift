@@ -9,10 +9,9 @@
 import UIKit
 import CVCalendar
 import RealmSwift
-import ENSwiftSideMenu
 import MGSwipeTableCell
 
-class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate, ENSideMenuDelegate {
+class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     
     @IBOutlet weak var menuView: CVCalendarMenuView!
     @IBOutlet weak var calendarView: CVCalendarView!
@@ -42,9 +41,12 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
             let monthSTR = monthFormater.stringFromDate(NSDate())
             currentDay = Int(daySTR)! - 1
             currenMonth = Int(monthSTR)! - 1
+            toDoTable.rowHeight = UITableViewAutomaticDimension
+            toDoTable.estimatedRowHeight = 62
             print(currentDay, currenMonth)
         }
         
+        let dateFormater = NSDateFormatter()
         calendarView.toggleViewWithDate(dateFromSubVC)
         
         load()
@@ -78,7 +80,7 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     }
     
     override func viewDidAppear(animated: Bool) {
-        self.sideMenuController()?.sideMenu?.delegate = self
+        toDoTable.reloadData()
     }
     
     func didSelectDayView(dayView: DayView, animationDidFinish: Bool) {
@@ -115,9 +117,6 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     
     func tapped() {
         view.endEditing(true)
-        if isSideMenuOpen() {
-            toggleSideMenuView()
-        }
     }
     
     func load() {
@@ -191,7 +190,8 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
         return .WeekView
     }
     @IBAction func menu(sender: AnyObject) {
-        toggleSideMenuView()
+        
+        sideMenuViewController?._presentLeftMenuViewController()
     }
     
     @IBAction func addToBuyThing(sender: AnyObject) {

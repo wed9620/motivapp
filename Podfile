@@ -7,10 +7,8 @@ use_frameworks!
 
 target 'Motivation' do
 
-pod 'ENSwiftSideMenu', '~> 0.1'
 pod 'RealmSwift'
 pod 'MGSwipeTableCell'
 pod 'CVCalendar', '~> 1.2.9'
 
 end
-
