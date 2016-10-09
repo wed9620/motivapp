@@ -16,27 +16,27 @@ class AuthorVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var url : NSURL!
+        var url : URL!
         navBar.title = author
         switch author {
         case "Билл Гейтс":
-            url = NSBundle.mainBundle().URLForResource("heitz", withExtension:"html")
+            url = Bundle.main.url(forResource: "heitz", withExtension:"html")
         
             break
         case "Генри Форд":
-            url = NSBundle.mainBundle().URLForResource("henry_ford", withExtension:"html")
+            url = Bundle.main.url(forResource: "henry_ford", withExtension:"html")
             break
         case "Джордж Сорос":
-            url = NSBundle.mainBundle().URLForResource("Soros", withExtension:"html")
+            url = Bundle.main.url(forResource: "Soros", withExtension:"html")
             break
         case "Криштиану Роналду" :
-            url = NSBundle.mainBundle().URLForResource("ronaldo", withExtension:"html")
+            url = Bundle.main.url(forResource: "ronaldo", withExtension:"html")
         case "Джон Дэвисон Рокфеллер":
-            url = NSBundle.mainBundle().URLForResource("rokfeller", withExtension:"html")
+            url = Bundle.main.url(forResource: "rokfeller", withExtension:"html")
         default:
             break
         }
-        let request = NSURLRequest(URL: url!)
+        let request = URLRequest(url: url!)
         webView.loadRequest(request)
         // Do any additional setup after loading the view.
     }

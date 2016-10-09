@@ -28,7 +28,7 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        citatesView.type = .CoverFlow
+        citatesView.type = .coverFlow
         view.addGestureRecognizer(tap)
         citatesView.addGestureRecognizer(tap)
         citatesView.scrollSpeed = 0.3
@@ -36,8 +36,8 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
         // Do any additional setup after loading the view.
     }
     
-    override func viewDidAppear(animated: Bool) {
-        view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
+    override func viewDidAppear(_ animated: Bool) {
+        view.frame = CGRect(x: 0, y: 0 , width: view.frame.width, height: view.frame.height)
     }
     
 //    func sideMenuWillOpen() {
@@ -75,7 +75,7 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
         parseJSON()
     }
 
-    func numberOfItemsInCarousel(carousel: iCarousel) -> Int {
+    func numberOfItems(in carousel: iCarousel) -> Int {
         guard tab != nil else{
             return itemsArray.count
         }
@@ -85,39 +85,39 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
             return itemsArray.count
         }
     }
-    func carousel(carousel: iCarousel, viewForItemAtIndex index: Int, reusingView view: UIView?) -> UIView {
+    func carousel(_ carousel: iCarousel, viewForItemAt index: Int, reusing view: UIView?) -> UIView {
         var item = itemsArray[index]
         if tab.selectedItem == fav {
             item = favItems[index]
         } else {
             item = itemsArray[index]
             for cit in favItems {
-                if cit.valueForKey("title") as! String == item.valueForKey("title") as! String {
+                if (cit as AnyObject).value(forKey: "title") as! String == (item as AnyObject).value(forKey: "title") as! String {
                     item = cit
                 }
             }
         }
         
         favButton = UIButton(frame: CGRect(x: 125, y: 320, width: 50, height: 50))
-        favButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), forState: .Highlighted)
-        favButton.setImage(UIImage(named: "favYES"), forState: .Normal)
+        favButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), for: .highlighted)
+        favButton.setImage(UIImage(named: "favYES"), for: UIControlState())
         favButton.tag = index
-        favButton.addTarget(self, action: #selector(Citates.favoriteTapped(_:)), forControlEvents: .TouchUpInside)
+        favButton.addTarget(self, action: #selector(Citates.favoriteTapped(_:)), for: .touchUpInside)
         let tempView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 400))
         tempView.backgroundColor = UIColor(red: 0.65, green: 0.65, blue: 0.65, alpha: 0.8)
         let bgImage = UIImageView(image: UIImage(named: "citBG"))
         bgImage.frame = CGRect(x: 0, y: 50, width: 300, height: 250)
         let citateLabel = UITextView(frame: CGRect(x: 0, y: 50, width: 300, height: 250))
-        citateLabel.text = item.valueForKey("title") as! String
+        citateLabel.text = (item as AnyObject).value(forKey: "title") as! String
         citateLabel.font = UIFont(name: (citateLabel.font?.fontName)!, size: 20)
-        citateLabel.textColor = UIColor.whiteColor()
+        citateLabel.textColor = UIColor.white
         citateLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.7)
-        citateLabel.userInteractionEnabled = false
+        citateLabel.isUserInteractionEnabled = false
         let authorButton = UIButton(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
-        authorButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), forState: .Highlighted)
-        authorButton.setTitle("\(item.valueForKey("author") as! String)", forState: .Normal)
-        authorButton.addTarget(self, action: #selector(Citates.showIt(_:)), forControlEvents: .TouchUpInside)
-        authorButton.titleLabel!.textColor = UIColor.blackColor()
+        authorButton.setTitleColor(UIColor(colorLiteralRed: 74/255, green: 207/255, blue: 1, alpha: 1), for: .highlighted)
+        authorButton.setTitle("\((item as AnyObject).value(forKey: "author") as! String)", for: UIControlState())
+        authorButton.addTarget(self, action: #selector(Citates.showIt(_:)), for: .touchUpInside)
+        authorButton.titleLabel!.textColor = UIColor.black
         tempView.addSubview(bgImage)
         tempView.addSubview(citateLabel)
         tempView.addSubview(authorButton)
@@ -127,32 +127,32 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
         return tempView
     }
     
-    func showIt(sender: UIButton) {
+    func showIt(_ sender: UIButton) {
         
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc : AuthorVC = mainStoryboard.instantiateViewControllerWithIdentifier("Author") as! AuthorVC
+        let vc : AuthorVC = mainStoryboard.instantiateViewController(withIdentifier: "Author") as! AuthorVC
         vc.author = (sender.titleLabel?.text!)!
-        navigationController?.showViewController(vc, sender: nil)
+        navigationController?.show(vc, sender: nil)
     }
     
-    func favoriteTapped(sender: UIButton) {
+    func favoriteTapped(_ sender: UIButton) {
         
         
         var item = itemsArray[sender.tag]
         if tab.selectedItem == fav {
             item = favItems[sender.tag]
         }
-        let ON = item.valueForKey("favorite") as! Bool
+        let ON = (item as AnyObject).value(forKey: "favorite") as! Bool
         if ON == false {
             let newItem = ["title":item["title"] as! String, "author": item["author"] as! String, "favorite": true]
-            itemsArray.removeObjectAtIndex(sender.tag)
-            itemsArray.insertObject(newItem, atIndex: sender.tag)
+            itemsArray.removeObject(at: sender.tag)
+            itemsArray.insert(newItem, at: sender.tag)
             addToDB(sender.tag)
             citatesView.reloadData()
         } else if ON == true {
             if tab.selectedItem == fav {
                 let newItem = ["title":item["title"] as! String, "author": item["author"] as! String, "favorite": false]
-                let citToDel = realm.objects(FavCitates).filter("title = '\(newItem.valueForKey("title") as! String)'")
+                let citToDel = realm.objects(FavCitates).filter("title = '\(newItem.value(forKey: "title") as! String)'")
                 let cit = citToDel.first!
                 try! realm.write {
                     realm.delete(cit)
@@ -163,7 +163,7 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
         }
     }
     
-    func addToDB(index:Int) {
+    func addToDB(_ index:Int) {
         let citate = itemsArray[index] as! NSDictionary
         for cit in favItems  {
             if cit as! NSObject == citate {
@@ -171,33 +171,33 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
             }
         }
         let myCitate = FavCitates()
-        myCitate.title = citate.valueForKey("title") as! String
-        myCitate.author = citate.valueForKey("author") as! String
+        myCitate.title = citate.value(forKey: "title") as! String
+        myCitate.author = citate.value(forKey: "author") as! String
         myCitate.favorite = true
         try! realm.write {
             realm.add(myCitate)
         }
-        favItems.addObject(citate)
+        favItems.add(citate)
     }
     
-    func carousel(carousel: iCarousel, valueForOption option: iCarouselOption, withDefault value: CGFloat) -> CGFloat {
-        if option == iCarouselOption.Spacing {
+    func carousel(_ carousel: iCarousel, valueFor option: iCarouselOption, withDefault value: CGFloat) -> CGFloat {
+        if option == iCarouselOption.spacing {
             return value*2
         }
         return value
     }
     
     func parseJSON() {
-        let path = NSBundle.mainBundle().pathForResource("Citates", ofType: "json")
-        let JSONData = NSData(contentsOfFile: path!)
-        if let JSONResult: NSDictionary = try! NSJSONSerialization.JSONObjectWithData(JSONData!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary {
+        let path = Bundle.main.path(forResource: "Citates", ofType: "json")
+        let JSONData = try? Data(contentsOf: URL(fileURLWithPath: path!))
+        if let JSONResult: NSDictionary = try! JSONSerialization.jsonObject(with: JSONData!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
             let itemsArr = JSONResult["citates"] as! NSArray
             for item in itemsArr {
-                itemsArray.addObject(["title":item["title"] as! String, "author": item["author"] as! String, "favorite": false])
+                itemsArray.add(["title":item["title"] as! String, "author": item["author"] as! String, "favorite": false])
             }
         }
     }
-    @IBAction func toggle(sender: AnyObject) {
+    @IBAction func toggle(_ sender: AnyObject) {
         
         sideMenuViewController?._presentLeftMenuViewController()
     }
@@ -205,13 +205,13 @@ class Citates: UIViewController, iCarouselDelegate, iCarouselDataSource {
         favItems.removeAllObjects()
         let favs = realm.objects(FavCitates)
         for fav in favs {
-            favItems.addObject(fav)
+            favItems.add(fav)
         }
     }
 }
 
 extension Citates: UITabBarDelegate {
-    func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
+    func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         citatesView.reloadData()
     }
 }

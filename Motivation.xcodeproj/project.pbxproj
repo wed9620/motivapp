@@ -280,6 +280,7 @@
 					9AFB24271CA53EEB0012D5F3 = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 648BQAMWFK;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -524,6 +525,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Motivation/Motivation-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -543,6 +545,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Motivation/Motivation-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

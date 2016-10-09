@@ -25,8 +25,8 @@ class CalendarVC: UIViewController, CVCalendarViewDelegate, CVCalendarMenuViewDe
         view.addGestureRecognizer(tap)
     }
     
-    override func viewDidAppear(animated: Bool) {
-        view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
+    override func viewDidAppear(_ animated: Bool) {
+        view.frame = CGRect(x: 0, y: 0 , width: view.frame.width, height: view.frame.height)
     }
     
     override func viewDidLayoutSubviews() {
@@ -37,11 +37,11 @@ class CalendarVC: UIViewController, CVCalendarViewDelegate, CVCalendarMenuViewDe
         navItem.title = "\(calendarView.presentedDate.commonDescription)"
     }
     
-    func didSelectDayView(dayView: DayView, animationDidFinish: Bool) {
+    func didSelectDayView(_ dayView: DayView, animationDidFinish: Bool) {
             let mainSoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc : PlanVC = mainSoryboard.instantiateViewControllerWithIdentifier("Plan") as! PlanVC
+            let vc : PlanVC = mainSoryboard.instantiateViewController(withIdentifier: "Plan") as! PlanVC
             vc.dateFromSubVC = dayView.date.convertedDate()!
-            navigationController?.showViewController(vc, sender: nil)
+            navigationController?.show(vc, sender: nil)
     }
     
     func shouldAutoSelectDayOnMonthChange() -> Bool {
@@ -54,19 +54,19 @@ class CalendarVC: UIViewController, CVCalendarViewDelegate, CVCalendarMenuViewDe
     }
     
     func presentationMode() -> CalendarMode {
-        return .MonthView
+        return .monthView
     }
     
     func firstWeekday() -> Weekday {
-        return .Monday
+        return .monday
     }
     
-    @IBAction func menu(sender: AnyObject) {
+    @IBAction func menu(_ sender: AnyObject) {
         
         sideMenuViewController?._presentLeftMenuViewController()
     }
     
-    @IBAction func today(sender: AnyObject) {
+    @IBAction func today(_ sender: AnyObject) {
         calendarView.toggleCurrentDayView()
     }
 }

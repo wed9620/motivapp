@@ -32,7 +32,7 @@ happening when initializing a Realm instance.
     }
 
 */
-public enum Error: ErrorType {
+public enum Error: Error {
     // swiftlint:disable variable_name
     /// :nodoc:
     public var _code: Int {
@@ -46,50 +46,50 @@ public enum Error: ErrorType {
     // swiftlint:enable variable_name
 
     /// The RLMError value, which can be used to derive the error's code.
-    private var rlmError: RLMError {
+    fileprivate var rlmError: RLMError {
         switch self {
-        case .Fail:
-            return RLMError.Fail
-        case .FileAccess:
-            return RLMError.FileAccess
-        case .FilePermissionDenied:
-            return RLMError.FilePermissionDenied
-        case .FileExists:
-            return RLMError.FileExists
-        case .FileNotFound:
-            return RLMError.FileNotFound
-        case .IncompatibleLockFile:
-            return RLMError.IncompatibleLockFile
-        case .FileFormatUpgradeRequired:
-            return RLMError.FileFormatUpgradeRequired
+        case .fail:
+            return RLMError.fail
+        case .fileAccess:
+            return RLMError.fileAccess
+        case .filePermissionDenied:
+            return RLMError.filePermissionDenied
+        case .fileExists:
+            return RLMError.fileExists
+        case .fileNotFound:
+            return RLMError.fileNotFound
+        case .incompatibleLockFile:
+            return RLMError.incompatibleLockFile
+        case .fileFormatUpgradeRequired:
+            return RLMError.fileFormatUpgradeRequired
         }
     }
 
     /// Error thrown by Realm if no other specific error is returned when a realm is opened.
-    case Fail
+    case fail
 
     /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
-    case FileAccess
+    case fileAccess
 
     /// Error thrown by Realm if the user does not have permission to open or create
     /// the specified file in the specified access mode when the realm is opened.
-    case FilePermissionDenied
+    case filePermissionDenied
 
     /// Error thrown by Realm if the file already exists when a copy should be written.
-    case FileExists
+    case fileExists
 
     /// Error thrown by Realm if no file was found when a realm was opened as
     /// read-only or if the directory part of the specified path was not found
     /// when a copy should be written.
-    case FileNotFound
+    case fileNotFound
 
     /// Error thrown by Realm if the database file is currently open in another process which
     /// cannot share with the current process due to an architecture mismatch.
-    case IncompatibleLockFile
+    case incompatibleLockFile
 
     /// Returned by RLMRealm if a file format upgrade is required to open the file,
     /// but upgrades were explicilty disabled.
-    case FileFormatUpgradeRequired
+    case fileFormatUpgradeRequired
 }
 
 // MARK: Equatable
@@ -97,7 +97,7 @@ public enum Error: ErrorType {
 extension Error: Equatable {}
 
 /// Returns whether the two errors are identical
-public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
+public func == (lhs: Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
 }
@@ -108,6 +108,6 @@ public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:t
 Explicitly implement pattern matching for `Realm.Error`, so that the instances can be used in the
 `do … syntax`.
 */
-public func ~= (lhs: Error, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
+public func ~= (lhs: Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
     return lhs == rhs
 }

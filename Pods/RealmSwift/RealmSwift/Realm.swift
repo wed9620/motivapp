@@ -50,7 +50,7 @@ public final class Realm {
     public var path: String { return rlmRealm.path }
 
     /// Indicates if this Realm was opened in read-only mode.
-    public var readOnly: Bool { return rlmRealm.readOnly }
+    public var readOnly: Bool { return rlmRealm.isReadOnly }
 
     /// The Schema used by this realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
@@ -107,8 +107,8 @@ public final class Realm {
 
     - throws: An NSError if the transaction could not be written.
     */
-    public func write(@noescape block: (() -> Void)) throws {
-        try rlmRealm.transactionWithBlock(block)
+    public func write(_ block: (() -> Void)) throws {
+        try rlmRealm.transaction(block)
     }
 
     /**
@@ -210,7 +210,7 @@ public final class Realm {
     - parameter object: Object to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add(object: Object, update: Bool = false) {
+    public func add(_ object: Object, update: Bool = false) {
         if update && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
@@ -227,7 +227,7 @@ public final class Realm {
     - parameter objects: A sequence which contains objects to be added to this Realm.
     - parameter update: If true will try to update existing objects with the same primary key.
     */
-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
+    public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
         }
@@ -256,12 +256,12 @@ public final class Realm {
 
     - returns: The created object.
     */
-    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
+    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         let className = (type as Object.Type).className()
         if update && schema[className]?.primaryKeyProperty == nil {
             throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: T.self)
     }
 
     /**
@@ -292,11 +292,11 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject {
         if update && schema[className]?.primaryKeyProperty == nil {
             throwRealmException("'\(className)' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), DynamicObject.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, className, value, update), to: DynamicObject.self)
     }
 
     // MARK: Deleting objects
@@ -308,7 +308,7 @@ public final class Realm {
 
     - parameter object: The object to be deleted.
     */
-    public func delete(object: Object) {
+    public func delete(_ object: Object) {
         RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
@@ -320,7 +320,7 @@ public final class Realm {
     - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
                          or any other enumerable SequenceType which generates Object.
     */
-    public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
         for obj in objects {
             delete(obj)
         }
@@ -335,7 +335,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func delete<T: Object>(objects: List<T>) {
+    public func delete<T: Object>(_ objects: List<T>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -348,7 +348,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func delete<T: Object>(objects: Results<T>) {
+    public func delete<T: Object>(_ objects: Results<T>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -370,7 +370,7 @@ public final class Realm {
 
     - returns: All objects of the given type in Realm.
     */
-    public func objects<T: Object>(type: T.Type) -> Results<T> {
+    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -389,7 +389,7 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjects(className: String) -> Results<DynamicObject> {
+    public func dynamicObjects(_ className: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, className, nil))
     }
 
@@ -407,8 +407,8 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), Optional<T>.self)
+    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key), to: Optional<T>.self)
     }
 
     /**
@@ -433,8 +433,8 @@ public final class Realm {
 
     :nodoc:
     */
-    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject) -> DynamicObject? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), Optional<DynamicObject>.self)
+    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, className, key), to: Optional<DynamicObject>.self)
     }
 
     // MARK: Notifications
@@ -458,8 +458,8 @@ public final class Realm {
     - returns: A notification token which can later be passed to `removeNotification(_:)`
                to remove this notification.
     */
-    @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
+    
+    public func addNotificationBlock(_ block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock(rlmNotificationBlockFromNotificationBlock(block))
     }
 
@@ -470,7 +470,7 @@ public final class Realm {
     - parameter notificationToken: The token returned from `addNotificationBlock(_:)`
                                    corresponding to the notification block to remove.
     */
-    public func removeNotification(notificationToken: NotificationToken) {
+    public func removeNotification(_ notificationToken: NotificationToken) {
         rlmRealm.removeNotification(notificationToken)
     }
 
@@ -567,11 +567,11 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) throws {
+    public func writeCopyToPath(_ path: String, encryptionKey: Data? = nil) throws {
         if let encryptionKey = encryptionKey {
-            try rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey)
+            try rlmRealm.writeCopy(toPath: path, encryptionKey: encryptionKey)
         } else {
-            try rlmRealm.writeCopyToPath(path)
+            try rlmRealm.writeCopy(toPath: path)
         }
     }
 
@@ -619,10 +619,10 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
 
-internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
+internal func rlmNotificationBlockFromNotificationBlock(_ notificationBlock: @escaping NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
+        return notificationBlock(Notification(rawValue: rlmNotification)!, Realm(rlmRealm))
     }
 }

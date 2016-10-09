@@ -26,14 +26,14 @@ class AddToDoThing: UIViewController, UITextViewDelegate {
         // Do any additional setup after loading the view.
         
         toDo.text = "Введите описание"
-        toDo.textColor = UIColor.lightGrayColor()
+        toDo.textColor = UIColor.lightGray
  
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToDoThing.keyboardWillShow(_:)), name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToDoThing.keyboardWillHide(_:)), name: UIKeyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AddToDoThing.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AddToDoThing.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     
     }
     
-    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if(text == "\n") {
             textView.resignFirstResponder()
             return false
@@ -41,35 +41,35 @@ class AddToDoThing: UIViewController, UITextViewDelegate {
         return true
     }
     
-    func textViewDidBeginEditing(textView: UITextView) {
-        if textView.textColor == UIColor.lightGrayColor() {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
             textView.text = nil
-            textView.textColor = UIColor.blackColor()
+            textView.textColor = UIColor.black
         }
     }
     
-    func textViewDidEndEditing(textView: UITextView) {
+    func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
             textView.text = "Введите описание"
-            textView.textColor = UIColor.lightGrayColor()
+            textView.textColor = UIColor.lightGray
         }
     }
     
-    func keyboardWillShow(notification:NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
+    func keyboardWillShow(_ notification:Notification) {
+        if let keyboardSize = ((notification as NSNotification).userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             self.view.frame.origin.y -= keyboardSize.height
         }
     }
     
-    func keyboardWillHide(notification:NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
+    func keyboardWillHide(_ notification:Notification) {
+        if let keyboardSize = ((notification as NSNotification).userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             self.view.frame.origin.y += keyboardSize.height
         }
     }
     
     override func awakeFromNib() {
         
-        view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
+        view.frame = CGRect(x: 0, y: 0 , width: view.frame.width, height: view.frame.height)
     }
 
     override func didReceiveMemoryWarning() {
@@ -105,67 +105,67 @@ class AddToDoThing: UIViewController, UITextViewDelegate {
         view.endEditing(true)
     }
     
-    @IBAction func add(sender: AnyObject) {
+    @IBAction func add(_ sender: AnyObject) {
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main",bundle: nil)
         
         if toDo.text == "" {
             let alert = UIAlertController(title: "Пусто",
                                           message: "Вы ничего не ввели",
-                                          preferredStyle: .Alert)
+                                          preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "OK",
-                                             style: .Default) { (action: UIAlertAction!) -> Void in
+                                             style: .default) { (action: UIAlertAction!) -> Void in
             }
             alert.addAction(cancelAction)
             
-            presentViewController(alert, animated: true, completion: nil)
-        } else if toDo.text.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 200 {
+            present(alert, animated: true, completion: nil)
+        } else if toDo.text.lengthOfBytes(using: String.Encoding.utf8) > 200 {
             let alert = UIAlertController(title: "Ошибка",
                                           message: "Введено недопустимое число символов",
-                                          preferredStyle: .Alert)
+                                          preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "OK",
-                                             style: .Default) { (action: UIAlertAction!) -> Void in
+                                             style: .default) { (action: UIAlertAction!) -> Void in
             }
             alert.addAction(cancelAction)
             
-            presentViewController(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
 
         }
         else {
 
-            let formaterForHour = NSDateFormatter()
-            let formaterForMinute = NSDateFormatter()
-            let formaterForDate = NSDateFormatter()
-            let formaterYear = NSDateFormatter()
-            let year = NSDate()
+            let formaterForHour = DateFormatter()
+            let formaterForMinute = DateFormatter()
+            let formaterForDate = DateFormatter()
+            let formaterYear = DateFormatter()
+            let year = Date()
             formaterYear.dateFormat = "yyyy"
             formaterForDate.dateFormat = "dd.MM.yyyy-HH:mm"
             formaterForHour.dateFormat = "HH"
             formaterForMinute.dateFormat = "mm"
-            let timeStrHour = formaterForHour.stringFromDate(time.date)
-            let timeStrMin = formaterForMinute.stringFromDate(time.date)
-            let yearStr = formaterYear.stringFromDate(year)
+            let timeStrHour = formaterForHour.string(from: time.date)
+            let timeStrMin = formaterForMinute.string(from: time.date)
+            let yearStr = formaterYear.string(from: year)
             
-            let finalDate = formaterForDate.dateFromString("\(currentDay+1).\(currentMonth+1).\(yearStr)-\(timeStrHour):\(timeStrMin)")
+            let finalDate = formaterForDate.date(from: "\(currentDay+1).\(currentMonth+1).\(yearStr)-\(timeStrHour):\(timeStrMin)")
             
-            print("date:::::::::>>>>>", formaterForDate.stringFromDate(finalDate!))
+            print("date:::::::::>>>>>", formaterForDate.string(from: finalDate!))
             
             let toDoDict: [String:String] = ["timeHour" : timeStrHour, "timeMin" : timeStrMin, "todo" : toDo.text!]
             
             let notification = UILocalNotification()
-            notification.timeZone = NSTimeZone.systemTimeZone()
-            notification.fireDate = finalDate!.dateByAddingTimeInterval(-300)
+            notification.timeZone = TimeZone.current
+            notification.fireDate = finalDate!.addingTimeInterval(-300)
             notification.alertBody = "Через 5 минут:\(toDo.text!)"
             notification.soundName = UILocalNotificationDefaultSoundName
-            UIApplication.sharedApplication().scheduleLocalNotification(notification)
+            UIApplication.shared.scheduleLocalNotification(notification)
             
             let notification1 = UILocalNotification()
-            notification1.timeZone = NSTimeZone.systemTimeZone()
+            notification1.timeZone = TimeZone.current
             notification1.fireDate = finalDate!
             notification1.alertBody = "\(toDo.text!)"
             notification1.soundName = UILocalNotificationDefaultSoundName
-            UIApplication.sharedApplication().scheduleLocalNotification(notification1)
+            UIApplication.shared.scheduleLocalNotification(notification1)
             
-            let planVC : PlanVC = mainStoryboard.instantiateViewControllerWithIdentifier("Plan") as! PlanVC
+            let planVC : PlanVC = mainStoryboard.instantiateViewController(withIdentifier: "Plan") as! PlanVC
             planVC.currentDay = currentDay
             planVC.currenMonth = currentMonth
             planVC.addToDoThing(toDoDict)

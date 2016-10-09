@@ -11,14 +11,14 @@ import EventKit
 
 struct TodoItem {
     var title: String
-    var deadline: NSDate
+    var deadline: Date
     var UUID: String
-    var rep: NSCalendarUnit
+    var rep: NSCalendar.Unit
     var isOverdue: Bool {
-        return (NSDate().compare(self.deadline) == NSComparisonResult.OrderedDescending)
+        return (Date().compare(self.deadline) == ComparisonResult.orderedDescending)
     }
     
-    init(deadline: NSDate, rep: NSCalendarUnit, title: String, UUID: String) {
+    init(deadline: Date, rep: NSCalendar.Unit, title: String, UUID: String) {
         self.deadline = deadline
         self.title = title
         self.UUID = UUID
@@ -34,7 +34,7 @@ class AddNotification: UITableViewController {
     @IBOutlet weak var dateViewLabel: UILabel!
     @IBOutlet weak var dateViewer: UITableViewCell!
     @IBOutlet weak var dateCell: UITableViewCell!
-    var curRep = NSCalendarUnit.Minute
+    var curRep = NSCalendar.Unit.minute
     
     @IBOutlet weak var repPickerContainer: UITableViewCell!
     @IBOutlet weak var repLabelContainer: UITableViewCell!
@@ -42,7 +42,7 @@ class AddNotification: UITableViewController {
     @IBOutlet weak var repContainer: UITableViewCell!
     
     @IBOutlet weak var rep: UISwitch!
-    let repArr = [NSCalendarUnit.Minute, NSCalendarUnit.Hour, NSCalendarUnit.Day, NSCalendarUnit.Weekday, NSCalendarUnit.Year]
+    let repArr = [NSCalendar.Unit.minute, NSCalendar.Unit.hour, NSCalendar.Unit.day, NSCalendar.Unit.weekday, NSCalendar.Unit.year]
     let reps = ["Никогда", "Каждый час", "Каждый день" , "Каждую неделю", "Каждый год"]
     var tap = UITapGestureRecognizer()
     
@@ -61,68 +61,68 @@ class AddNotification: UITableViewController {
         tap = UITapGestureRecognizer(target: self, action: #selector(AddNotification.tapped))
         view.addGestureRecognizer(tap)
         
-        repLabelContainer.hidden = true
-        repPickerContainer.hidden = true
-        dateCell.hidden = true
-        dateViewer.hidden = true
-        repContainer.hidden = true
+        repLabelContainer.isHidden = true
+        repPickerContainer.isHidden = true
+        dateCell.isHidden = true
+        dateViewer.isHidden = true
+        repContainer.isHidden = true
     }
     
-    override func viewDidAppear(animated: Bool) {
-        view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
+    override func viewDidAppear(_ animated: Bool) {
+        view.frame = CGRect(x: 0, y: 0 , width: view.frame.width, height: view.frame.height)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    @IBAction func repSwitched(sender: AnyObject) {
-        if self.rep.on == true {
-            repLabelContainer.hidden = false
-            repPickerContainer.hidden = false
+    @IBAction func repSwitched(_ sender: AnyObject) {
+        if self.rep.isOn == true {
+            repLabelContainer.isHidden = false
+            repPickerContainer.isHidden = false
         } else {
-            repLabelContainer.hidden = true
-            repPickerContainer.hidden = true
+            repLabelContainer.isHidden = true
+            repPickerContainer.isHidden = true
         }
     }
     
-    @IBAction func switched(sender: AnyObject) {
-        if remind.on == true {
-            dateCell.hidden = false
-            dateViewer.hidden = false
-            repContainer.hidden = false
+    @IBAction func switched(_ sender: AnyObject) {
+        if remind.isOn == true {
+            dateCell.isHidden = false
+            dateViewer.isHidden = false
+            repContainer.isHidden = false
         } else {
-            dateCell.hidden = true
-            dateViewer.hidden = true
-            repContainer.hidden = true
-            rep.on = false
+            dateCell.isHidden = true
+            dateViewer.isHidden = true
+            repContainer.isHidden = true
+            rep.isOn = false
         }
         repSwitched(self)
     }
     
-    @IBAction func dateChanged(sender: AnyObject) {
-        let dateFormatter = NSDateFormatter()
+    @IBAction func dateChanged(_ sender: AnyObject) {
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd-MM-yyyy HH:mm"
-        dateViewLabel.text = dateFormatter.stringFromDate(date.date)
+        dateViewLabel.text = dateFormatter.string(from: date.date)
     }
     
-    @IBAction func save(sender: AnyObject) {
+    @IBAction func save(_ sender: AnyObject) {
         
-        if remind.on == true {
+        if remind.isOn == true {
             
             citate.parseJSON()
             let randomNumber = arc4random_uniform(UInt32(citate.itemsArray.count))
             let randCitate = citate.itemsArray[Int(randomNumber)]
-            let citTitle = randCitate.valueForKey("title") as! String
+            let citTitle = (randCitate as AnyObject).value(forKey: "title") as! String
             print(citTitle)
             
-            let todoItem = TodoItem(deadline: date.date, rep: curRep, title: "\(tit.text! + "\nЦитата: " + citTitle)", UUID: NSUUID().UUIDString)
+            let todoItem = TodoItem(deadline: date.date, rep: curRep, title: "\(tit.text! + "\nЦитата: " + citTitle)", UUID: UUID().uuidString)
             TodoList.sharedInstance.addItem(todoItem)
         }
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main",bundle: nil)
-        let vc : ViewController = mainStoryboard.instantiateViewControllerWithIdentifier("VC") as! ViewController
+        let vc : ViewController = mainStoryboard.instantiateViewController(withIdentifier: "VC") as! ViewController
         
-        navigationController?.popViewControllerAnimated(true)
+        navigationController?.popViewController(animated: true)
     }
     
     
@@ -134,16 +134,16 @@ class AddNotification: UITableViewController {
 extension AddNotification: UIPickerViewDelegate, UIPickerViewDataSource {
     
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return reps.count
     }
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return reps[row]
     }
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         repLabel.text = reps[row]
         curRep = repArr[row]
     }

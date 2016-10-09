@@ -10,6 +10,26 @@ import UIKit
 import CVCalendar
 import RealmSwift
 import MGSwipeTableCell
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     
@@ -19,7 +39,7 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     @IBOutlet weak var toBuyTable: UITableView!
     var currentDay = 0
     var currenMonth = 0
-    var dateFromSubVC = NSDate()
+    var dateFromSubVC = Foundation.Date()
     let realm = try! Realm()
     var toDoList = Array<Array<NSMutableArray>>()
     var toBuyList = NSMutableArray()
@@ -33,12 +53,12 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
         initArray()
         
         if currentDay == 0 || currenMonth == 0 {
-            let dayFormater = NSDateFormatter()
+            let dayFormater = DateFormatter()
             dayFormater.dateFormat = "dd"
-            let monthFormater = NSDateFormatter()
+            let monthFormater = DateFormatter()
             monthFormater.dateFormat = "MM"
-            let daySTR = dayFormater.stringFromDate(NSDate())
-            let monthSTR = monthFormater.stringFromDate(NSDate())
+            let daySTR = dayFormater.string(from: Foundation.Date())
+            let monthSTR = monthFormater.string(from: Foundation.Date())
             currentDay = Int(daySTR)! - 1
             currenMonth = Int(monthSTR)! - 1
             toDoTable.rowHeight = UITableViewAutomaticDimension
@@ -46,7 +66,7 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
             print(currentDay, currenMonth)
         }
         
-        let dateFormater = NSDateFormatter()
+        let dateFormater = DateFormatter()
         calendarView.toggleViewWithDate(dateFromSubVC)
         
         load()
@@ -65,25 +85,25 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     }
     
     
-    @IBAction func todayTapped(sender: AnyObject) {
+    @IBAction func todayTapped(_ sender: AnyObject) {
         calendarView.toggleCurrentDayView()
     }
     
-    @IBAction func addToDoThingTapped(sender: AnyObject) {
+    @IBAction func addToDoThingTapped(_ sender: AnyObject) {
         
         let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc : AddToDoThing = mainStoryboard.instantiateViewControllerWithIdentifier("ATDT") as! AddToDoThing
+        let vc : AddToDoThing = mainStoryboard.instantiateViewController(withIdentifier: "ATDT") as! AddToDoThing
         vc.currentDay = currentDay
         vc.currentMonth = currenMonth
-        navigationController?.showViewController(vc, sender: nil)
+        navigationController?.show(vc, sender: nil)
         
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         toDoTable.reloadData()
     }
     
-    func didSelectDayView(dayView: DayView, animationDidFinish: Bool) {
+    func didSelectDayView(_ dayView: DayView, animationDidFinish: Bool) {
         currentDay = dayView.date.day - 1
         currenMonth = dayView.date.month - 1
         toDoTable.reloadData()
@@ -122,11 +142,11 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     func load() {
         let toDos = realm.objects(toDo)
         for todo in toDos {
-            toDoList[todo.month][todo.day].addObject(["timeHour":todo.timeHour, "timeMin":todo.timeMin, "todo":todo.toDo])
+            toDoList[todo.month][todo.day].add(["timeHour":todo.timeHour, "timeMin":todo.timeMin, "todo":todo.toDo])
         }
         let toBuys = realm.objects(toBuy)
         for tobuy in toBuys {
-            toBuyList.addObject(tobuy.toBuyStr)
+            toBuyList.add(tobuy.toBuyStr)
         }
         sortArr()
     }
@@ -138,24 +158,24 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
                 var swapped = false
                 let pass = (size - 1) - i
                 for j in 0..<pass {
-                    let key = Int(toDoList[currenMonth][currentDay][j].valueForKey("timeHour") as! String)
-                    if key > Int(toDoList[currenMonth][currentDay][j+1].valueForKey("timeHour") as! String) {
-                        let tempDic = NSDictionary(dictionary: ["timeHour":toDoList[currenMonth][currentDay][j].valueForKey("timeHour") as! String, "timeMin":toDoList[currenMonth][currentDay][j].valueForKey("timeMin") as! String, "todo":toDoList[currenMonth][currentDay][j].valueForKey("todo") as! String])
-                        let keyDic = NSDictionary(dictionary: ["timeHour":toDoList[currenMonth][currentDay][j+1].valueForKey("timeHour") as! String, "timeMin":toDoList[currenMonth][currentDay][j+1].valueForKey("timeMin") as! String, "todo":toDoList[currenMonth][currentDay][j+1].valueForKey("todo") as! String])
-                        toDoList[currenMonth][currentDay].replaceObjectAtIndex(j, withObject: keyDic)
-                        toDoList[currenMonth][currentDay].replaceObjectAtIndex(j+1, withObject: tempDic)
+                    let key = Int((toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeHour") as! String)
+                    if key > Int((toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeHour") as! String) {
+                        let tempDic = NSDictionary(dictionary: ["timeHour":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeHour") as! String, "timeMin":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeMin") as! String, "todo":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "todo") as! String])
+                        let keyDic = NSDictionary(dictionary: ["timeHour":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeHour") as! String, "timeMin":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeMin") as! String, "todo":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "todo") as! String])
+                        toDoList[currenMonth][currentDay].replaceObject(at: j, with: keyDic)
+                        toDoList[currenMonth][currentDay].replaceObject(at: j+1, with: tempDic)
                         swapped = true
-                    } else if key == Int(toDoList[currenMonth][currentDay][j+1].valueForKey("timeHour") as! String) {
+                    } else if key == Int((toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeHour") as! String) {
                         for k in 0..<size {
                             var sw = false
                             let pss = (size - 1) - k
                             for j in 0..<pss {
-                                let key = Int(toDoList[currenMonth][currentDay][j].valueForKey("timeMin") as! String)
-                                if key > Int(toDoList[currenMonth][currentDay][j+1].valueForKey("timeMin") as! String) {
-                                    let tempDic = NSDictionary(dictionary: ["timeHour":toDoList[currenMonth][currentDay][j].valueForKey("timeHour") as! String, "timeMin":toDoList[currenMonth][currentDay][j].valueForKey("timeMin") as! String, "todo":toDoList[currenMonth][currentDay][j].valueForKey("todo") as! String])
-                                    let keyDic = NSDictionary(dictionary: ["timeHour":toDoList[currenMonth][currentDay][j+1].valueForKey("timeHour") as! String, "timeMin":toDoList[currenMonth][currentDay][j+1].valueForKey("timeMin") as! String, "todo":toDoList[currenMonth][currentDay][j+1].valueForKey("todo") as! String])
-                                    toDoList[currenMonth][currentDay].replaceObjectAtIndex(j, withObject: keyDic)
-                                    toDoList[currenMonth][currentDay].replaceObjectAtIndex(j+1, withObject: tempDic)
+                                let key = Int((toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeMin") as! String)
+                                if key > Int((toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeMin") as! String) {
+                                    let tempDic = NSDictionary(dictionary: ["timeHour":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeHour") as! String, "timeMin":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "timeMin") as! String, "todo":(toDoList[currenMonth][currentDay][j] as AnyObject).value(forKey: "todo") as! String])
+                                    let keyDic = NSDictionary(dictionary: ["timeHour":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeHour") as! String, "timeMin":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "timeMin") as! String, "todo":(toDoList[currenMonth][currentDay][j+1] as AnyObject).value(forKey: "todo") as! String])
+                                    toDoList[currenMonth][currentDay].replaceObject(at: j, with: keyDic)
+                                    toDoList[currenMonth][currentDay].replaceObject(at: j+1, with: tempDic)
                                     sw = true
                                 }
                             }
@@ -184,21 +204,21 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
     }
     
     func firstWeekday() -> Weekday {
-        return .Monday
+        return .monday
     }
     func presentationMode() -> CalendarMode {
-        return .WeekView
+        return .weekView
     }
-    @IBAction func menu(sender: AnyObject) {
+    @IBAction func menu(_ sender: AnyObject) {
         
         sideMenuViewController?._presentLeftMenuViewController()
     }
     
-    @IBAction func addToBuyThing(sender: AnyObject) {
-        let addBuy = UIAlertController(title: "Добавить покупку", message: "", preferredStyle: .Alert)
-        let addBuyAction = UIAlertAction(title: "Добавить", style: .Default, handler: { (_) in
+    @IBAction func addToBuyThing(_ sender: AnyObject) {
+        let addBuy = UIAlertController(title: "Добавить покупку", message: "", preferredStyle: .alert)
+        let addBuyAction = UIAlertAction(title: "Добавить", style: .default, handler: { (_) in
             let toBuyField = addBuy.textFields![0] as UITextField
-            self.toBuyList.addObject(toBuyField.text!)
+            self.toBuyList.add(toBuyField.text!)
             let myToBuy = toBuy()
             myToBuy.toBuyStr = toBuyField.text! as String
             try! self.realm.write{
@@ -206,25 +226,25 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
             }
             self.toBuyTable.reloadData()
         })
-        let cancel = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-        addBuy.addTextFieldWithConfigurationHandler { (textField) in
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        addBuy.addTextField { (textField) in
             textField.placeholder = "Например: Хлеб"
             
-            NSNotificationCenter.defaultCenter().addObserverForName(UITextFieldTextDidChangeNotification, object: textField, queue: NSOperationQueue.mainQueue()) { (notification) in
-                addBuyAction.enabled = textField.text != ""
+            NotificationCenter.default.addObserver(forName: NSNotification.Name.UITextFieldTextDidChange, object: textField, queue: OperationQueue.main) { (notification) in
+                addBuyAction.isEnabled = textField.text != ""
             }
         }
         
         addBuy.addAction(addBuyAction)
         addBuy.addAction(cancel)
-        self.presentViewController(addBuy, animated: true, completion:nil)
+        self.present(addBuy, animated: true, completion:nil)
     }
     
-    func addToDoThing(toDoThing: NSDictionary) {
+    func addToDoThing(_ toDoThing: NSDictionary) {
         let myToDo = toDo()
-        myToDo.timeHour = "\(toDoThing.valueForKey("timeHour")!)"
-        myToDo.timeMin = "\(toDoThing.valueForKey("timeMin")!)"
-        myToDo.toDo = toDoThing.valueForKey("todo") as! String
+        myToDo.timeHour = "\(toDoThing.value(forKey: "timeHour")!)"
+        myToDo.timeMin = "\(toDoThing.value(forKey: "timeMin")!)"
+        myToDo.toDo = toDoThing.value(forKey: "todo") as! String
         myToDo.day = currentDay
         myToDo.month = currenMonth
         try! realm.write {
@@ -237,11 +257,11 @@ class PlanVC: UIViewController, UITableViewDelegate, CVCalendarViewDelegate, CVC
 
 extension PlanVC: UITableViewDataSource {
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.toDoTable {
             return toDoList[currenMonth][currentDay].count
         } else if tableView == self.toBuyTable{
@@ -250,17 +270,17 @@ extension PlanVC: UITableViewDataSource {
         return 0
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if tableView == self.toDoTable {
-            let toDoThing = toDoList[currenMonth][currentDay][indexPath.row]
-            let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! ToDoCell
-            cell.rightButtons = [MGSwipeButton(title: "Удалить", backgroundColor: UIColor.redColor()
+            let toDoThing = toDoList[currenMonth][currentDay][(indexPath as NSIndexPath).row]
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! ToDoCell
+            cell.rightButtons = [MGSwipeButton(title: "Удалить", backgroundColor: UIColor.red
                 ,callback: {
                     (sender: MGSwipeTableCell!) -> Bool in
                     
-                    self.toDoList[self.currenMonth][self.currentDay].removeObjectAtIndex(indexPath.row)
-                    let toDoToDel = self.realm.objects(toDo).filter("toDo = '\(toDoThing.valueForKey("todo") as! String)'")
+                    self.toDoList[self.currenMonth][self.currentDay].removeObject(at: (indexPath as NSIndexPath).row)
+                    let toDoToDel = self.realm.objects(toDo).filter("toDo = '\(toDoThing.value(forKey: "todo") as! String)'")
                     let doing = toDoToDel.first!
                     try! self.realm.write {
                         self.realm.delete(doing)
@@ -268,18 +288,18 @@ extension PlanVC: UITableViewDataSource {
                     tableView.reloadData()
                     return true
             })]
-            cell.time.text = "\(toDoThing.valueForKey("timeHour")! as! String):\(toDoThing.valueForKey("timeMin")! as! String)"
-            cell.toDo.text = toDoThing.valueForKey("todo") as? String
+            cell.time.text = "\((toDoThing as AnyObject).value(forKey: "timeHour")! as! String):\((toDoThing as AnyObject).value(forKey: "timeMin")! as! String)"
+            cell.toDo.text = (toDoThing as AnyObject).value(forKey: "todo") as? String
             return cell
             
         } else {
-            let toByuThing = toBuyList[indexPath.row]
-            let cell = tableView.dequeueReusableCellWithIdentifier("Buy") as! MGSwipeTableCell
-            cell.rightButtons = [MGSwipeButton(title: "Удалить", backgroundColor: UIColor.redColor()
+            let toByuThing = toBuyList[(indexPath as NSIndexPath).row]
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Buy") as! MGSwipeTableCell
+            cell.rightButtons = [MGSwipeButton(title: "Удалить", backgroundColor: UIColor.red
                 ,callback: {
                     (sender: MGSwipeTableCell!) -> Bool in
                     
-                    self.toBuyList.removeObjectAtIndex(indexPath.row)
+                    self.toBuyList.removeObject(at: (indexPath as NSIndexPath).row)
                     let toBuyToDel = self.realm.objects(toBuy).filter("toBuyStr = '\(toByuThing as! String)'")
                     let buing = toBuyToDel.first!
                     try! self.realm.write {

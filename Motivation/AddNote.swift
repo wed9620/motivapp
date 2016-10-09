@@ -29,26 +29,26 @@ class AddNote: UIViewController, UITextViewDelegate {
         view.addGestureRecognizer(tap)
         loadTemplates()
         desc.text = "Введите описание"
-        desc.textColor = UIColor.lightGrayColor()
+        desc.textColor = UIColor.lightGray
         
         desc.delegate = self 
     }
     
-    func textViewDidBeginEditing(textView: UITextView) {
-        if textView.textColor == UIColor.lightGrayColor() {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
             textView.text = nil
-            textView.textColor = UIColor.blackColor()
+            textView.textColor = UIColor.black
         }
     }
     
-    func textViewDidEndEditing(textView: UITextView) {
+    func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
             textView.text = "Введите описание"
-            textView.textColor = UIColor.lightGrayColor()
+            textView.textColor = UIColor.lightGray
         }
     }
     
-    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if(text == "\n") {
             textView.resignFirstResponder()
             return false
@@ -56,8 +56,8 @@ class AddNote: UIViewController, UITextViewDelegate {
         return true
     }
     
-    override func viewDidAppear(animated: Bool) {
-        view.frame = CGRectMake(0, 0 , view.frame.width, view.frame.height)
+    override func viewDidAppear(_ animated: Bool) {
+        view.frame = CGRect(x: 0, y: 0 , width: view.frame.width, height: view.frame.height)
     }
     
     override func didReceiveMemoryWarning() {
@@ -65,23 +65,23 @@ class AddNote: UIViewController, UITextViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func addNote(sender: AnyObject) {
+    @IBAction func addNote(_ sender: AnyObject) {
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main",bundle: nil)
         let parentVC = ViewController()
         if desc.text == "" {
             let alert = UIAlertController(title: "Пусто",
                                           message: "Вы ничего не ввели",
-                                          preferredStyle: .Alert)
+                                          preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "OK",
-                                             style: .Default) { (action: UIAlertAction!) -> Void in
+                                             style: .default) { (action: UIAlertAction!) -> Void in
             }
             alert.addAction(cancelAction)
             
-            presentViewController(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         } else {
             parentVC.addItemToCollection(desc.text!)
         }
-        navigationController?.pushViewController(mainStoryboard.instantiateViewControllerWithIdentifier("VC"), animated: true)
+        navigationController?.pushViewController(mainStoryboard.instantiateViewController(withIdentifier: "VC"), animated: true)
     }
     
     func OK() {
@@ -91,28 +91,28 @@ class AddNote: UIViewController, UITextViewDelegate {
     func loadTemplates() {
         let temps = realm.objects(Templates)
         for temp in temps {
-            templates.addObject(["title":temp.title, "description":temp.desc])
+            templates.add(["title":temp.title, "description":temp.desc])
         }
         parseJSON()
     }
     
     func parseJSON() {
-        let path = NSBundle.mainBundle().pathForResource("templates", ofType: "json")
-        let JSONData = NSData(contentsOfFile: path!)
-        if let JSONResult: NSDictionary = try! NSJSONSerialization.JSONObjectWithData(JSONData!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary {
+        let path = Bundle.main.path(forResource: "templates", ofType: "json")
+        let JSONData = try? Data(contentsOf: URL(fileURLWithPath: path!))
+        if let JSONResult: NSDictionary = try! JSONSerialization.jsonObject(with: JSONData!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
             let itemsArr = JSONResult["templates"] as! NSArray
             for item in itemsArr {
-                templates.addObject(["title": item["title"] as! String])
+                templates.add(["title": item["title"] as! String])
             }
         }
     }
     
-    func addFromTemplate(sender: UIButton) {
+    func addFromTemplate(_ sender: UIButton) {
         let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main",bundle: nil)
         let parentVC = ViewController()
         let template = self.templates[sender.tag]
         parentVC.addItemToCollection(template["title"] as! String)
-        self.navigationController?.pushViewController(mainStoryboard.instantiateViewControllerWithIdentifier("VC"), animated: true)
+        self.navigationController?.pushViewController(mainStoryboard.instantiateViewController(withIdentifier: "VC"), animated: true)
     }
     
 }
@@ -120,18 +120,18 @@ class AddNote: UIViewController, UITextViewDelegate {
 
 extension AddNote: UITableViewDelegate, UITableViewDataSource {
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return templates.count
     }
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell")! as! templateCell
-        let template = templates[indexPath.row]
-        cell.desc.text = template.valueForKey("title") as? String
-        cell.addClicked.addTarget(self, action: #selector(AddNote.addFromTemplate(_:)), forControlEvents: .TouchUpInside)
-        cell.addClicked.tag = indexPath.row
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")! as! templateCell
+        let template = templates[(indexPath as NSIndexPath).row]
+        cell.desc.text = (template as AnyObject).value(forKey: "title") as? String
+        cell.addClicked.addTarget(self, action: #selector(AddNote.addFromTemplate(_:)), for: .touchUpInside)
+        cell.addClicked.tag = (indexPath as NSIndexPath).row
         return cell
     }
 }
