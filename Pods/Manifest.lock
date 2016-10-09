@@ -8,7 +8,7 @@ PODS:
     - Realm (= 0.98.6)
 
 DEPENDENCIES:
-  - CVCalendar (~> 1.2.9)
+  - CVCalendar
   - MGSwipeTableCell
   - RealmSwift
 
@@ -18,6 +18,4 @@ SPEC CHECKSUMS:
   Realm: 44803f35418c5d89b27825a564247fcd190de37e
   RealmSwift: c7239c52c83f8c43525a5269ba7be1694da33afc
 
-PODFILE CHECKSUM: 23fff6c7880f95b44ca50bd2dc2d80dcbc8bb886
-
-COCOAPODS: 1.0.1
+COCOAPODS: 0.39.0

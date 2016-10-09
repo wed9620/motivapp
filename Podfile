@@ -9,6 +9,6 @@ target 'Motivation' do
 
 pod 'RealmSwift'
 pod 'MGSwipeTableCell'
-pod 'CVCalendar', '~> 1.2.9'
+pod 'CVCalendar'
 
 end

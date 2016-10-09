@@ -99,6 +99,7 @@ class SideBar: UITableViewController {
         }
 
         sideMenuViewController?.contentViewController = UINavigationController(rootViewController: destViewController)
+        sideMenuViewController?.contentViewController?.viewDidLoad()
         sideMenuViewController?.hideMenuViewController()
     }
 }

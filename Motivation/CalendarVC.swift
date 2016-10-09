@@ -38,10 +38,11 @@ class CalendarVC: UIViewController, CVCalendarViewDelegate, CVCalendarMenuViewDe
     }
     
     func didSelectDayView(_ dayView: DayView, animationDidFinish: Bool) {
-            let mainSoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc : PlanVC = mainSoryboard.instantiateViewController(withIdentifier: "Plan") as! PlanVC
-            vc.dateFromSubVC = dayView.date.convertedDate()!
-            navigationController?.show(vc, sender: nil)
+        let mainSoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc : PlanVC = mainSoryboard.instantiateViewController(withIdentifier: "Plan") as! PlanVC
+        vc.dateFromSubVC = dayView.date.convertedDate()!
+        
+        sideMenuViewController?.contentViewController = UINavigationController(rootViewController: vc)
     }
     
     func shouldAutoSelectDayOnMonthChange() -> Bool {
